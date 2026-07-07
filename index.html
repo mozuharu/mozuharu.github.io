@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>資産運用シミュレーション</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Hiragino Sans', 'Noto Sans JP', sans-serif; background: #f0f4f8; color: #2d3748; padding: 16px; }
+  h1 { font-size: 18px; text-align: center; color: #2b6cb0; margin-bottom: 16px; }
+  .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .label { font-size: 12px; color: #718096; margin-bottom: 4px; }
+  .big { font-size: 28px; font-weight: 700; color: #2b6cb0; }
+  .sub { font-size: 13px; color: #4a5568; margin-top: 4px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+  .mini-card { background: white; border-radius: 10px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.07); }
+  .mini-label { font-size: 11px; color: #718096; margin-bottom: 3px; }
+  .mini-val { font-size: 18px; font-weight: 700; color: #2d3748; }
+  .accent { color: #e53e3e; }
+  .green { color: #276749; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { background: #ebf8ff; color: #2b6cb0; padding: 7px 5px; text-align: right; }
+  th:first-child { text-align: center; }
+  td { padding: 6px 5px; border-bottom: 1px solid #e2e8f0; text-align: right; }
+  td:first-child { text-align: center; font-weight: 600; }
+  tr:last-child td { border-bottom: none; font-weight: 700; background: #fff5f5; }
+  .bar-wrap { height: 8px; background: #e2e8f0; border-radius: 4px; margin-top: 6px; }
+  .bar { height: 8px; border-radius: 4px; background: linear-gradient(90deg, #4299e1, #2b6cb0); }
+  .note { font-size: 11px; color: #a0aec0; margin-top: 10px; line-height: 1.6; }
+  .phase { font-size: 12px; color: #4a5568; }
+  input[type=range] { width: 100%; margin: 8px 0; }
+  .slider-label { display: flex; justify-content: space-between; font-size: 12px; color: #718096; }
+  button { background: #2b6cb0; color: white; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; cursor: pointer; width: 100%; margin-top: 8px; }
+  .section-title { font-size: 13px; font-weight: 700; color: #4a5568; margin-bottom: 8px; border-left: 3px solid #4299e1; padding-left: 8px; }
+</style>
+</head>
+<body>
+<h1>💰 資産運用シミュレーション</h1>
+
+<div class="card">
+  <div class="section-title">条件設定</div>
+  <div style="margin-bottom:10px">
+    <div class="label">初期資産</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input type="number" id="principal" value="5000" style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:6px;font-size:16px"> <span>万円</span>
+    </div>
+  </div>
+  <div style="margin-bottom:10px">
+    <div class="label">年利率: <span id="rateLabel">4.0</span>%</div>
+    <input type="range" id="rate" min="1" max="8" step="0.5" value="4" oninput="document.getElementById('rateLabel').textContent=parseFloat(this.value).toFixed(1)">
+    <div class="slider-label"><span>1%</span><span>8%</span></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <div style="flex:1">
+      <div class="label">現在の年齢</div>
+      <input type="number" id="nowAge" value="58" style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:6px;font-size:16px">
+    </div>
+    <div style="flex:1">
+      <div class="label">引き出し開始</div>
+      <input type="number" id="startAge" value="65" style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:6px;font-size:16px">
+    </div>
+    <div style="flex:1">
+      <div class="label">目標年齢</div>
+      <input type="number" id="endAge" value="100" style="width:100%;padding:8px;border:1px solid #e2e8f0;border-radius:6px;font-size:16px">
+    </div>
+  </div>
+  <button onclick="calc()">計算する</button>
+</div>
+
+<div class="card" id="result" style="display:none">
+  <div class="section-title">シミュレーション結果</div>
+  <div class="label">65歳時点の資産（7年運用後）</div>
+  <div class="big" id="atStart"></div>
+  <div class="sub" id="growthNote"></div>
+</div>
+
+<div class="grid2" id="grid" style="display:none">
+  <div class="mini-card">
+    <div class="mini-label">月に使える金額</div>
+    <div class="mini-val" id="monthly"></div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">年に使える金額</div>
+    <div class="mini-val" id="yearly"></div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">取り崩し期間</div>
+    <div class="mini-val" id="period"></div>
+  </div>
+  <div class="mini-card">
+    <div class="mini-label">運用利息合計</div>
+    <div class="mini-val green" id="totalInterest"></div>
+  </div>
+</div>
+
+<div class="card" id="tableCard" style="display:none">
+  <div class="section-title">年齢別残高推移（抜粋）</div>
+  <table id="tbl">
+    <thead><tr><th>年齢</th><th>年初残高</th><th>運用益</th><th>引き出し</th><th>年末残高</th></tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <p class="note">※ 運用益に対して税金（約20%）がかかる場合、実際の手取りは少なくなります。<br>※ インフレや市場変動は考慮していません。目安としてご参照ください。</p>
+</div>
+
+<script>
+function fmt(n) {
+  if(n >= 10000) return (n/10000).toFixed(1) + '億円';
+  return Math.round(n).toLocaleString() + '万円';
+}
+function fmtM(n) { return Math.round(n).toLocaleString() + '万円'; }
+
+function calc() {
+  const P = parseFloat(document.getElementById('principal').value);
+  const r = parseFloat(document.getElementById('rate').value) / 100;
+  const nowAge = parseInt(document.getElementById('nowAge').value);
+  const startAge = parseInt(document.getElementById('startAge').value);
+  const endAge = parseInt(document.getElementById('endAge').value);
+
+  // 65歳までの運用
+  const growYears = startAge - nowAge;
+  const atStart = P * Math.pow(1 + r, growYears);
+
+  // 65〜100歳: 定額取り崩し（年金現価の逆）
+  const n = endAge - startAge; // 35年
+  // 年利r、n年間で全額使い切る年払い額
+  // PMT = PV * r / (1 - (1+r)^-n)
+  let annualDraw;
+  if (r === 0) {
+    annualDraw = atStart / n;
+  } else {
+    annualDraw = atStart * r / (1 - Math.pow(1 + r, -n));
+  }
+  const monthlyDraw = annualDraw / 12;
+
+  document.getElementById('atStart').textContent = fmt(atStart);
+  document.getElementById('growthNote').textContent = `初期${fmtM(P)} → ${growYears}年間4%複利運用`;
+  document.getElementById('monthly').innerHTML = `<span style="font-size:22px;color:#e53e3e">${Math.round(monthlyDraw).toLocaleString()}</span><span style="font-size:13px">万円/月</span>`;
+  document.getElementById('yearly').innerHTML = `<span style="font-size:22px">${Math.round(annualDraw).toLocaleString()}</span><span style="font-size:13px">万円/年</span>`;
+  document.getElementById('period').innerHTML = `<span style="font-size:22px">${n}</span><span style="font-size:13px">年間</span>`;
+
+  // 利息合計計算
+  let balance = atStart;
+  let totalInt = 0;
+  for(let i = 0; i < n; i++) {
+    const interest = balance * r;
+    totalInt += interest;
+    balance = balance + interest - annualDraw;
+  }
+  document.getElementById('totalInterest').innerHTML = `<span style="font-size:18px">+${fmt(totalInt)}</span>`;
+
+  // テーブル
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  balance = atStart;
+  const showAges = [65, 70, 75, 80, 85, 90, 95, 100];
+  for(let i = 0; i < n; i++) {
+    const age = startAge + i;
+    const interest = balance * r;
+    const newBalance = balance + interest - annualDraw;
+    if(showAges.includes(age) || i === n-1) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${age}歳</td><td>${fmtM(balance)}</td><td class="green">+${fmtM(interest)}</td><td class="accent">-${fmtM(annualDraw)}</td><td>${fmtM(Math.max(0,newBalance))}</td>`;
+      tbody.appendChild(tr);
+    }
+    balance = newBalance;
+  }
+
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('grid').style.display = 'grid';
+  document.getElementById('tableCard').style.display = 'block';
+}
+
+// 初期計算
+calc();
+</script>
+</body>
+</html>
