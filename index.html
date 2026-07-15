@@ -69,7 +69,7 @@
 
 <div class="card" id="result" style="display:none">
   <div class="section-title">シミュレーション結果</div>
-  <div class="label">65歳時点の資産（7年運用後）</div>
+  <div class="label" id="resultLabel">引き出し開始時点の資産</div>
   <div class="big" id="atStart"></div>
   <div class="sub" id="growthNote"></div>
 </div>
@@ -116,7 +116,12 @@ function calc() {
   const startAge = parseInt(document.getElementById('startAge').value);
   const endAge = parseInt(document.getElementById('endAge').value);
 
-  // 65歳までの運用
+  if (startAge < nowAge || endAge <= startAge) {
+    alert('年齢の設定を確認してください（現在の年齢 ≦ 引き出し開始 < 目標年齢）');
+    return;
+  }
+
+  // 引き出し開始までの運用
   const growYears = startAge - nowAge;
   const atStart = P * Math.pow(1 + r, growYears);
 
@@ -132,8 +137,9 @@ function calc() {
   }
   const monthlyDraw = annualDraw / 12;
 
+  document.getElementById('resultLabel').textContent = `${startAge}歳時点の資産（${growYears}年運用後）`;
   document.getElementById('atStart').textContent = fmt(atStart);
-  document.getElementById('growthNote').textContent = `初期${fmtM(P)} → ${growYears}年間4%複利運用`;
+  document.getElementById('growthNote').textContent = `初期${fmtM(P)} → ${growYears}年間${parseFloat(document.getElementById('rate').value).toFixed(1)}%複利運用`;
   document.getElementById('monthly').innerHTML = `<span style="font-size:22px;color:#e53e3e">${Math.round(monthlyDraw).toLocaleString()}</span><span style="font-size:13px">万円/月</span>`;
   document.getElementById('yearly').innerHTML = `<span style="font-size:22px">${Math.round(annualDraw).toLocaleString()}</span><span style="font-size:13px">万円/年</span>`;
   document.getElementById('period').innerHTML = `<span style="font-size:22px">${n}</span><span style="font-size:13px">年間</span>`;
@@ -152,12 +158,13 @@ function calc() {
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
   balance = atStart;
-  const showAges = [65, 70, 75, 80, 85, 90, 95, 100];
   for(let i = 0; i < n; i++) {
     const age = startAge + i;
     const interest = balance * r;
     const newBalance = balance + interest - annualDraw;
-    if(showAges.includes(age) || i === n-1) {
+    // 期間が10年以下なら全行表示、それ以上なら5年おき＋最初と最後
+    const show = (n <= 10) || (age % 5 === 0) || i === 0 || i === n-1;
+    if(show) {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td>${age}歳</td><td>${fmtM(balance)}</td><td class="green">+${fmtM(interest)}</td><td class="accent">-${fmtM(annualDraw)}</td><td>${fmtM(Math.max(0,newBalance))}</td>`;
       tbody.appendChild(tr);
