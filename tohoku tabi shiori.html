@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🚗 東北おんせん旅のしおり 2026夏</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sora:#a8d8ea;      /* 夏空ブルー */
+    --yama:#8fc7a0;      /* 山みどり */
+    --yu:#f7b7c8;        /* 温泉ピンク */
+    --himawari:#ffd97d;  /* ひまわり */
+    --kumo:#fffaf3;      /* 雲クリーム */
+    --sumi:#5b5147;      /* 文字色 */
+    --usu:#9a8f83;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Zen Maru Gothic',sans-serif;
+    background:linear-gradient(180deg,#eaf6fb 0%,#fffaf3 40%);
+    color:var(--sumi);
+    line-height:1.7;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px 60px;}
+
+  /* ===== 表紙 ===== */
+  header{text-align:center;padding:36px 12px 8px;}
+  .cover-svg{width:100%;max-width:420px;height:auto;}
+  h1{font-size:1.7rem;font-weight:900;letter-spacing:.08em;margin-top:4px;}
+  .sub{color:var(--usu);font-size:.95rem;margin-top:2px;}
+  .date-badge{
+    display:inline-block;margin-top:14px;padding:8px 22px;border-radius:999px;
+    background:#fff;border:2px dashed var(--yu);font-weight:700;font-size:1rem;
+  }
+
+  /* ===== ルート概要 ===== */
+  .route-box{
+    background:#fff;border-radius:22px;padding:20px 18px;margin:26px 0;
+    box-shadow:0 4px 14px rgba(120,150,170,.12);
+  }
+  .route-box h2{font-size:1.05rem;font-weight:900;text-align:center;margin-bottom:12px;}
+  .route-flow{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;font-size:.9rem;font-weight:700;}
+  .route-flow span{background:var(--kumo);border-radius:999px;padding:4px 12px;border:1.5px solid #f0e6d8;}
+  .route-flow .arrow{border:none;background:none;color:var(--usu);padding:4px 0;}
+
+  /* ===== 日ごとのセクション ===== */
+  .day{margin-top:34px;}
+  .day-head{
+    display:flex;align-items:center;gap:12px;margin-bottom:14px;
+  }
+  .day-num{
+    flex-shrink:0;width:64px;height:64px;border-radius:50%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    font-weight:900;color:#fff;line-height:1.1;
+  }
+  .day-num small{font-size:.6rem;font-weight:700;}
+  .day-num b{font-size:1.25rem;}
+  .d1 .day-num{background:var(--sora);}
+  .d2 .day-num{background:var(--yama);}
+  .d3 .day-num{background:var(--yu);}
+  .d4 .day-num{background:var(--himawari);color:var(--sumi);}
+  .day-title{font-size:1.15rem;font-weight:900;}
+  .day-title small{display:block;font-size:.8rem;color:var(--usu);font-weight:500;}
+
+  /* タイムライン */
+  .timeline{position:relative;padding-left:26px;}
+  .timeline::before{
+    content:"";position:absolute;left:8px;top:6px;bottom:6px;width:3px;
+    border-radius:3px;background:repeating-linear-gradient(180deg,#e3d9cb 0 8px,transparent 8px 16px);
+  }
+  .stop{position:relative;background:#fff;border-radius:16px;padding:12px 14px;margin-bottom:12px;
+    box-shadow:0 3px 10px rgba(120,150,170,.10);}
+  .stop::before{
+    content:"";position:absolute;left:-24px;top:18px;width:12px;height:12px;border-radius:50%;
+    background:#fff;border:3px solid var(--sora);
+  }
+  .d2 .stop::before{border-color:var(--yama);}
+  .d3 .stop::before{border-color:var(--yu);}
+  .d4 .stop::before{border-color:var(--himawari);}
+  .time{font-weight:900;font-size:.85rem;color:#fff;background:var(--sora);
+    display:inline-block;border-radius:999px;padding:1px 12px;margin-bottom:4px;}
+  .d2 .time{background:var(--yama);}
+  .d3 .time{background:var(--yu);}
+  .d4 .time{background:var(--himawari);color:var(--sumi);}
+  .stop h3{font-size:1rem;font-weight:900;}
+  .stop p{font-size:.88rem;margin-top:2px;}
+  .stop .memo{color:var(--usu);font-size:.8rem;margin-top:4px;}
+  .addr{display:block;margin-top:4px;font-size:.78rem;color:var(--usu);background:#faf6ee;border-radius:8px;padding:4px 8px;}
+  .addr b{color:var(--sumi);}
+  .drive{background:#f2f9fc;border:1.5px dashed var(--sora);box-shadow:none;}
+  .d2 .drive{background:#f1f8f2;border-color:var(--yama);}
+  .d3 .drive{background:#fdf3f6;border-color:var(--yu);}
+  .d4 .drive{background:#fff8e8;border-color:var(--himawari);}
+
+  /* 宿カード */
+  .hotel{
+    border-radius:18px;padding:16px;margin-top:6px;color:var(--sumi);
+    background:linear-gradient(135deg,#fff 60%,#fdf3f6);
+    border:2px solid var(--yu);
+  }
+  .hotel .tag{font-size:.7rem;font-weight:900;color:#fff;background:var(--yu);
+    border-radius:999px;padding:2px 12px;display:inline-block;}
+  .hotel h4{font-size:1.05rem;font-weight:900;margin:6px 0 4px;}
+  .hotel table{width:100%;font-size:.85rem;border-collapse:collapse;}
+  .hotel td{padding:2px 0;vertical-align:top;}
+  .hotel td:first-child{width:88px;color:var(--usu);font-weight:700;}
+
+  /* グルメ */
+  .gourmet{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;}
+  .g-card{background:var(--kumo);border-radius:14px;padding:10px 12px;font-size:.83rem;border:1.5px solid #f0e6d8;}
+  .g-card b{display:block;font-size:.9rem;}
+  @media(max-width:430px){.gourmet{grid-template-columns:1fr;}}
+
+  /* 持ち物 */
+  .checklist{background:#fff;border-radius:22px;padding:20px 18px;margin-top:40px;
+    box-shadow:0 4px 14px rgba(120,150,170,.12);}
+  .checklist h2{font-size:1.05rem;font-weight:900;text-align:center;margin-bottom:10px;}
+  .checklist ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.88rem;}
+  .checklist li::before{content:"🌼 ";}
+  @media(max-width:430px){.checklist ul{grid-template-columns:1fr;}}
+
+  footer{text-align:center;margin-top:44px;color:var(--usu);font-size:.8rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <svg class="cover-svg" viewBox="0 0 420 200" role="img" aria-label="山と温泉と車のイラスト">
+    <!-- 空 -->
+    <rect x="0" y="0" width="420" height="200" rx="24" fill="#dff1f9"/>
+    <!-- 太陽 -->
+    <circle cx="352" cy="44" r="20" fill="#ffd97d"/>
+    <g stroke="#ffd97d" stroke-width="4" stroke-linecap="round">
+      <line x1="352" y1="12" x2="352" y2="4"/><line x1="352" y1="76" x2="352" y2="84"/>
+      <line x1="320" y1="44" x2="312" y2="44"/><line x1="384" y1="44" x2="392" y2="44"/>
+      <line x1="330" y1="22" x2="324" y2="16"/><line x1="374" y1="66" x2="380" y2="72"/>
+      <line x1="374" y1="22" x2="380" y2="16"/><line x1="330" y1="66" x2="324" y2="72"/>
+    </g>
+    <!-- 雲 -->
+    <g fill="#ffffff">
+      <ellipse cx="80" cy="42" rx="30" ry="13"/><ellipse cx="104" cy="36" rx="22" ry="11"/>
+      <ellipse cx="250" cy="30" rx="24" ry="10"/>
+    </g>
+    <!-- 山 -->
+    <path d="M0 150 L90 70 L180 150 Z" fill="#8fc7a0"/>
+    <path d="M70 88 L90 70 L110 88 L100 96 L90 86 L80 96 Z" fill="#ffffff"/>
+    <path d="M120 150 L230 55 L340 150 Z" fill="#6fb188"/>
+    <path d="M205 77 L230 55 L255 77 L242 88 L230 74 L218 88 Z" fill="#ffffff"/>
+    <!-- 温泉 -->
+    <g>
+      <ellipse cx="345" cy="140" rx="42" ry="16" fill="#f7b7c8"/>
+      <ellipse cx="345" cy="136" rx="42" ry="14" fill="#fbd3de"/>
+      <g stroke="#f296b1" stroke-width="4" fill="none" stroke-linecap="round">
+        <path d="M330 122 q 5 -8 0 -16 q -5 -8 0 -14"/>
+        <path d="M345 120 q 5 -8 0 -16 q -5 -8 0 -14"/>
+        <path d="M360 122 q 5 -8 0 -16 q -5 -8 0 -14"/>
+      </g>
+    </g>
+    <!-- 道 -->
+    <path d="M0 200 Q 120 160 250 178 Q 340 190 420 172 L420 200 Z" fill="#c8bfae"/>
+    <path d="M0 196 Q 120 158 250 176 Q 340 188 420 170" stroke="#fff" stroke-width="3" stroke-dasharray="12 10" fill="none"/>
+    <!-- くるま -->
+    <g transform="translate(120 148)">
+      <rect x="0" y="10" width="76" height="26" rx="12" fill="#7fb5d9"/>
+      <path d="M12 12 Q 20 -4 38 -4 Q 56 -4 64 12 Z" fill="#a8d8ea"/>
+      <rect x="20" y="0" width="16" height="12" rx="4" fill="#eaf6fb"/>
+      <rect x="40" y="0" width="16" height="12" rx="4" fill="#eaf6fb"/>
+      <circle cx="18" cy="38" r="8" fill="#5b5147"/><circle cx="18" cy="38" r="3.5" fill="#fff"/>
+      <circle cx="58" cy="38" r="8" fill="#5b5147"/><circle cx="58" cy="38" r="3.5" fill="#fff"/>
+    </g>
+  </svg>
+  <h1>東北おんせん旅のしおり</h1>
+  <p class="sub">仙台・白布温泉・土湯温泉をめぐる 3泊4日ドライブ</p>
+  <div class="date-badge">2026.8.9（日）〜 8.12（水）</div>
+</header>
+
+<section class="route-box">
+  <h2>🗾 たびのルート</h2>
+  <div class="route-flow">
+    <span>🏠 東松戸</span><span class="arrow">→</span>
+    <span>🐄 仙台</span><span class="arrow">→</span>
+    <span>♨️ 白布温泉</span><span class="arrow">→</span>
+    <span>🙏 船引町</span><span class="arrow">→</span>
+    <span>♨️ 土湯温泉</span><span class="arrow">→</span>
+    <span>🏠 東松戸</span>
+  </div>
+</section>
+
+<!-- ===== 1日目 ===== -->
+<section class="day d1">
+  <div class="day-head">
+    <div class="day-num"><small>DAY</small><b>1</b></div>
+    <div class="day-title">東松戸 → 仙台<small>8月9日（日）｜牡蠣と牛タンの日 🦪🐄</small></div>
+  </div>
+  <div class="timeline">
+    <div class="stop drive">
+      <span class="time">6:00ごろ</span>
+      <h3>🚗 東松戸を出発</h3>
+      <p>外環道 → 常磐道 → 仙台方面へ（約350km・4〜4.5時間）</p>
+      <p class="memo">途中のSAで朝ごはん休憩をはさんでのんびりと🍙</p>
+      <span class="addr">☕ 守谷SA（下り）：茨城県守谷市野木崎97-3（最初の休憩に。パン屋さんが人気）</span>
+      <span class="addr">🌊 セデッテかしま（南相馬鹿島SA）：福島県南相馬市鹿島区右田字椴木沢212-1（中間地点。おみやげ充実）</span>
+    </div>
+    <div class="stop">
+      <span class="time">11:00〜</span>
+      <h3>🦪 牡蠣ランチ</h3>
+      <p>8月は三陸の夏牡蠣シーズン！仙台市内で牡蠣ランチ</p>
+      <div class="gourmet">
+        <div class="g-card"><b>かきや no KAKIYA</b>牡蠣仲卸直営。新鮮な三陸牡蠣の専門店<span class="addr">📍 仙台市青葉区立町26-16 早坂ビル1F<br>📞 050-5485-7620</span></div>
+        <div class="g-card"><b>かき徳</b>昭和2年創業の老舗。宮城牡蠣ひとすじ<span class="addr">📍 仙台市青葉区一番町4-9-1 5階<br>📞 022-222-0785</span></div>
+      </div>
+    </div>
+    <div class="stop">
+      <span class="time">13:30〜</span>
+      <h3>🏯 仙台さんぽ</h3>
+      <p>仙台城跡（伊達政宗騎馬像）・瑞鳳殿・定禅寺通のケヤキ並木など</p>
+      <span class="addr">📍 仙台城跡：仙台市青葉区川内1（青葉城址）</span>
+    </div>
+    <div class="stop">
+      <span class="time">15:00ごろ</span>
+      <h3>🏨 ホテルにチェックイン</h3>
+      <div class="hotel">
+        <span class="tag">1泊目のお宿</span>
+        <h4>ダイワロイネットホテル仙台西口 PREMIER</h4>
+        <table>
+          <tr><td>住所</td><td>宮城県仙台市青葉区中央3-7-25</td></tr>
+          <tr><td>電話</td><td>022-217-7255</td></tr>
+          <tr><td>チェックイン</td><td>8/9（日）14:00〜</td></tr>
+          <tr><td>チェックアウト</td><td>8/10（月）11:00</td></tr>
+          <tr><td>予約番号</td><td>RYa0mtapf6</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="stop">
+      <span class="time">18:00〜</span>
+      <h3>🐄 牛タンディナー</h3>
+      <div class="gourmet">
+        <div class="g-card"><b>牛たん焼 助</b>仙台駅・牛たん通り。熟成塩焼きと味噌焼きが人気<span class="addr">📍 仙台市青葉区中央1-1-1 仙台駅3階<br>📞 022-796-0833</span></div>
+        <div class="g-card"><b>牛たん料理 閣（かく）</b>1988年創業。名物「牛タンたたき」がイチオシ<span class="addr">📍 仙台市青葉区一番町3-8-14 鈴喜ビル B1F（ブランドーム本店）<br>📞 022-268-7067</span></div>
+      </div>
+      <p class="memo">🚶 どちらもホテルから徒歩圏内！車は置いたままビールもOK🍺<br>・助＝仙台駅3階なので徒歩約5分（駅直結で雨でも安心・駅ナカでずんだスイーツも買える🍡）<br>・閣＝一番町アーケードへ徒歩約10分（夜のアーケード散歩がてらちょうどいい距離）<br>人気店なので予約 or 早め入店が安心！</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 2日目 ===== -->
+<section class="day d2">
+  <div class="day-head">
+    <div class="day-num"><small>DAY</small><b>2</b></div>
+    <div class="day-title">仙台 → 米沢 → 白布温泉<small>8月10日（月）｜米沢牛と秘湯の日 🥩♨️</small></div>
+  </div>
+  <div class="timeline">
+    <div class="stop">
+      <span class="time">あさ</span>
+      <h3>🐟 仙台朝市をぶらり</h3>
+      <p>仙台駅西口すぐ。朝ごはん＆おみやげ探しに</p>
+      <span class="addr">📍 仙台市青葉区中央3-8-5</span>
+    </div>
+    <div class="stop drive">
+      <span class="time">10:30ごろ</span>
+      <h3>🚗 米沢へ出発</h3>
+      <p>東北道 → 東北中央道で米沢へ（約1.5〜2時間）</p>
+      <span class="addr">🍒 道の駅 米沢：山形県米沢市川井1039-1（米沢八幡原ICすぐ。米沢牛グルメ＆さくらんぼ関連のおみやげが充実）</span>
+      <p class="memo">💡 道の駅米沢は米沢八幡原（はちまんぱら）ICを降りてすぐ目の前の高速直結型。福島大笹生〜米沢八幡原は無料区間なので、ここで降りても料金的なロスなし！そのあとは下道で米沢市街（上杉神社方面）まで約15分。「高速の出口＝道の駅」なので、寄ってからそのまま米沢牛ランチへ向かう流れがスムーズです🥩</p>
+    </div>
+    <div class="stop">
+      <span class="time">12:30〜</span>
+      <h3>🥩 米沢牛ランチ＆上杉神社</h3>
+      <p>米沢市内で米沢牛ランチ。食後は上杉謙信公をまつる上杉神社へ⛩️</p>
+      <span class="addr">📍 上杉神社：山形県米沢市丸の内1-4-13　📞 0238-22-3189</span>
+    </div>
+    <div class="stop drive">
+      <span class="time">14:20ごろ</span>
+      <h3>🚗 山道をのぼって白布温泉へ</h3>
+      <p>米沢市街から約40分。西吾妻山のふもとへ</p>
+    </div>
+    <div class="stop">
+      <span class="time">15:00</span>
+      <h3>♨️ 秘湯のお宿へ</h3>
+      <div class="hotel">
+        <span class="tag">2泊目のお宿</span>
+        <h4>白布温泉 東屋（ひがしや）</h4>
+        <table>
+          <tr><td>住所</td><td>山形県米沢市関1537</td></tr>
+          <tr><td>電話</td><td>0238-55-2011</td></tr>
+          <tr><td>チェックイン</td><td>8/10（月）15:00〜</td></tr>
+          <tr><td>チェックアウト</td><td>8/11（火）10:00</td></tr>
+          <tr><td>予約番号</td><td>RYa0mtj1e3</td></tr>
+        </table>
+      </div>
+      <p class="memo">開湯700年の名湯。名物の滝風呂と旅館ごはんをゆっくり満喫🍶</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 3日目 ===== -->
+<section class="day d3">
+  <div class="day-head">
+    <div class="day-num"><small>DAY</small><b>3</b></div>
+    <div class="day-title">白布温泉 → 船引町 → 土湯温泉<small>8月11日（火）｜お墓参りの日 🙏♨️</small></div>
+  </div>
+  <div class="timeline">
+    <div class="stop drive">
+      <span class="time">10:00</span>
+      <h3>🚗 チェックアウト・福島方面へ</h3>
+      <p>米沢 → 東北中央道 → 福島 → 東北道・磐越道方面 → 船引三春ICへ（約2〜2.5時間）</p>
+    </div>
+    <div class="stop">
+      <span class="time">12:30ごろ</span>
+      <h3>🙏 船引町でお墓参り</h3>
+      <p>おまいりのあと、ごはん or 休憩をはさんで</p>
+      <p class="memo">お花・お線香・ライターを忘れずに🌸 夏なので虫よけもあると安心</p>
+    </div>
+    <div class="stop drive">
+      <span class="time">14:00すぎ</span>
+      <h3>🚗 土湯温泉へ</h3>
+      <p>船引から約1時間。吾妻連峰のふもとへ戻ります</p>
+      <span class="addr">⛰️ 道の駅 つちゆ：福島県福島市松川町水原字南沢41-2（国道115号沿い・チェックイン前のひと休みに。眺めがきれい）</span>
+    </div>
+    <div class="stop">
+      <span class="time">15:00ごろ</span>
+      <h3>♨️ 大人の隠れ宿へ</h3>
+      <div class="hotel">
+        <span class="tag">3泊目のお宿</span>
+        <h4>土湯別邸 里の湯</h4>
+        <table>
+          <tr><td>住所</td><td>福島県福島市土湯温泉町字悪戸尻27-2</td></tr>
+          <tr><td>電話</td><td>024-595-2146</td></tr>
+          <tr><td>チェックイン</td><td>8/11（火）14:00〜</td></tr>
+          <tr><td>チェックアウト</td><td>8/12（水）10:30</td></tr>
+        </table>
+      </div>
+      <p class="memo">最終夜は温泉三昧でごほうびタイム✨</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 4日目 ===== -->
+<section class="day d4">
+  <div class="day-head">
+    <div class="day-num"><small>DAY</small><b>4</b></div>
+    <div class="day-title">土湯温泉 → 東松戸<small>8月12日（水）｜おうちに帰る日 🏠</small></div>
+  </div>
+  <div class="timeline">
+    <div class="stop drive">
+      <span class="time">10:30</span>
+      <h3>🚗 チェックアウト・帰路へ</h3>
+      <p>福島西IC → 東北道 → 外環道で東松戸へ（約300km・3.5〜4時間）</p>
+    </div>
+    <div class="stop">
+      <span class="time">とちゅう</span>
+      <h3>🎁 SAでおみやげタイム</h3>
+      <p>最後のおかいものは東北道のSA・PAで</p>
+      <span class="addr">🍜 安達太良SA（上り）：福島県本宮市本宮字天ケ221（福島みやげのラストチャンス）</span>
+      <span class="addr">🏮 鬼平江戸処（羽生PA上り）：埼玉県羽生市弥勒字五軒1686（江戸の町並み風PA。うなぎや甘味も）</span>
+      <p class="memo">お盆時期なので渋滞情報はこまめにチェック🚗💦</p>
+    </div>
+    <div class="stop">
+      <span class="time">ゆうがた</span>
+      <h3>🏠 東松戸に到着</h3>
+      <p>おでん・もずく・はるおが待ってるよ🐕🐈🐈</p>
+    </div>
+  </div>
+</section>
+
+<section class="checklist">
+  <h2>🎒 もちもの チェック</h2>
+  <ul>
+    <li>運転免許証・ETCカード</li>
+    <li>予約確認（楽天トラベル）</li>
+    <li>お墓参りセット（お花・お線香）</li>
+    <li>虫よけ・日やけ止め</li>
+    <li>温泉用の小さいタオル</li>
+    <li>充電器・モバイルバッテリー</li>
+    <li>常備薬・酔い止め</li>
+    <li>ペットのお留守番準備🐾</li>
+  </ul>
+</section>
+
+<footer>たのしい旅になりますように 🌻♨️</footer>
+
+</div>
+</body>
+</html>
