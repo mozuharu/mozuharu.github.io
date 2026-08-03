@@ -23,6 +23,7 @@
   th:first-child { text-align: center; }
   td { padding: 6px 5px; border-bottom: 1px solid #e2e8f0; text-align: right; }
   td:first-child { text-align: center; font-weight: 600; }
+  tr.milestone td { background: #f7fafc; font-weight: 600; }
   tr:last-child td { border-bottom: none; font-weight: 700; background: #fff5f5; }
   .bar-wrap { height: 8px; background: #e2e8f0; border-radius: 4px; margin-top: 6px; }
   .bar { height: 8px; border-radius: 4px; background: linear-gradient(90deg, #4299e1, #2b6cb0); }
@@ -94,7 +95,7 @@
 </div>
 
 <div class="card" id="tableCard" style="display:none">
-  <div class="section-title">年齢別残高推移（抜粋）</div>
+  <div class="section-title">年齢別残高推移</div>
   <table id="tbl">
     <thead><tr><th>年齢</th><th>年初残高</th><th>運用益</th><th>引き出し</th><th>年末残高</th></tr></thead>
     <tbody id="tbody"></tbody>
@@ -162,13 +163,11 @@ function calc() {
     const age = startAge + i;
     const interest = balance * r;
     const newBalance = balance + interest - annualDraw;
-    // 期間が10年以下なら全行表示、それ以上なら5年おき＋最初と最後
-    const show = (n <= 10) || (age % 5 === 0) || i === 0 || i === n-1;
-    if(show) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${age}歳</td><td>${fmtM(balance)}</td><td class="green">+${fmtM(interest)}</td><td class="accent">-${fmtM(annualDraw)}</td><td>${fmtM(Math.max(0,newBalance))}</td>`;
-      tbody.appendChild(tr);
-    }
+    // 全ての年を表示
+    const tr = document.createElement('tr');
+    if(age % 5 === 0) tr.className = 'milestone';
+    tr.innerHTML = `<td>${age}歳</td><td>${fmtM(balance)}</td><td class="green">+${fmtM(interest)}</td><td class="accent">-${fmtM(annualDraw)}</td><td>${fmtM(Math.max(0,newBalance))}</td>`;
+    tbody.appendChild(tr);
     balance = newBalance;
   }
 
