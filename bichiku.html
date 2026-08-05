@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>備蓄点検表</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="備蓄点検表">
+<meta name="theme-color" content="#16323F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* JIS安全色を状態表示にだけ使う。それ以外の面は静かに保つ */
+  --danger:#E5352B;
+  --caution:#F6AA00;
+  --safe:#009F6B;
+  --ink:#14181B;
+  --ink-2:#5A6570;
+  --ink-3:#8B959D;
+  --paper:#F1F2EF;
+  --card:#FFFFFF;
+  --rule:#DFE2DE;
+  --chrome:#16323F;
+  --num:'Barlow Condensed','Hiragino Sans',sans-serif;
+  --body:'Noto Sans JP','Hiragino Kaku Gothic ProN',sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--body);
+  font-size:15px;line-height:1.6;padding-bottom:96px;
+  -webkit-font-smoothing:antialiased;
+}
+:focus-visible{outline:2px solid var(--chrome);outline-offset:2px}
+
+/* ── ヘッダー ─────────────────────────── */
+.masthead{
+  background:var(--chrome);color:#fff;
+  padding:calc(env(safe-area-inset-top) + 18px) 18px 16px;
+}
+.masthead h1{
+  font-family:var(--num);font-size:30px;font-weight:600;
+  letter-spacing:.14em;margin:0;line-height:1;
+}
+.masthead .sub{
+  font-size:11px;letter-spacing:.24em;color:#9DB4BE;margin-top:8px;
+}
+
+/* ── 集計バー（タップで絞り込み） ────────── */
+.tally{display:flex;gap:1px;background:var(--rule);border-bottom:1px solid var(--rule)}
+.tally button{
+  flex:1;border:0;background:var(--card);padding:11px 4px 10px;
+  font-family:var(--body);cursor:pointer;display:block;
+  border-top:3px solid transparent;
+}
+.tally button[aria-pressed="true"]{border-top-color:var(--chrome);background:#fff}
+.tally .n{font-family:var(--num);font-size:26px;font-weight:600;line-height:1;display:block}
+.tally .t{font-size:10.5px;color:var(--ink-2);letter-spacing:.04em;margin-top:4px;display:block}
+.tally .d0 .n{color:var(--danger)} .tally .d1 .n{color:var(--caution)}
+.tally .d2 .n{color:var(--safe)}  .tally .d3 .n{color:var(--ink)}
+
+/* ── 一覧 ───────────────────────────── */
+.list{padding:14px 12px 0;display:flex;flex-direction:column;gap:9px}
+.slip{
+  background:var(--card);border:1px solid var(--rule);border-radius:3px;
+  display:grid;grid-template-columns:6px 1fr auto;align-items:stretch;
+  overflow:hidden;
+}
+.slip .band{width:6px}
+.slip .body{padding:11px 12px 12px;min-width:0}
+.slip .name{font-weight:500;font-size:15.5px;line-height:1.35;word-break:break-word}
+.slip .meta{font-size:12px;color:var(--ink-2);margin-top:3px}
+.slip .meta .dot{color:var(--ink-3);margin:0 6px}
+.slip .right{
+  padding:11px 12px 12px 6px;text-align:right;display:flex;
+  flex-direction:column;justify-content:center;align-items:flex-end;
+}
+.slip .days{font-family:var(--num);font-size:31px;font-weight:600;line-height:.92}
+.slip .unit{font-size:10.5px;color:var(--ink-2);letter-spacing:.1em;margin-top:3px}
+
+/* 残り期間の目盛り：1年を満尺とした点検ゲージ */
+.gauge{margin-top:9px;height:7px;background:#EDEFEC;position:relative;border-radius:1px;overflow:hidden}
+.gauge i{position:absolute;inset:0 auto 0 0;display:block}
+.gauge b{
+  position:absolute;top:0;bottom:0;width:1px;background:#fff;opacity:.85
+}
+.scale{display:flex;justify-content:space-between;font-family:var(--num);
+  font-size:10px;color:var(--ink-3);letter-spacing:.08em;margin-top:3px}
+
+.s-danger .band{background:var(--danger)} .s-danger .days{color:var(--danger)} .s-danger .gauge i{background:var(--danger)}
+.s-caution .band{background:var(--caution)} .s-caution .days{color:#B87A00} .s-caution .gauge i{background:var(--caution)}
+.s-safe .band{background:var(--safe)} .s-safe .days{color:var(--safe)} .s-safe .gauge i{background:var(--safe)}
+
+.empty{
+  margin:40px 16px;padding:28px 20px;border:1px dashed var(--rule);
+  border-radius:3px;text-align:center;color:var(--ink-2);background:#FAFBF9;
+}
+.empty p{margin:0 0 16px}
+.empty .lead{color:var(--ink);font-weight:500;margin-bottom:6px}
+
+/* ── ボタン類 ───────────────────────── */
+.fab{
+  position:fixed;left:50%;transform:translateX(-50%);
+  bottom:calc(env(safe-area-inset-bottom) + 18px);
+  background:var(--chrome);color:#fff;border:0;border-radius:999px;
+  padding:15px 30px;font-family:var(--body);font-size:15px;font-weight:500;
+  box-shadow:0 6px 20px rgba(22,50,63,.3);cursor:pointer;z-index:20;
+}
+.fab:active{transform:translateX(-50%) scale(.97)}
+.txtbtn{
+  background:none;border:0;color:var(--ink-2);font-family:var(--body);
+  font-size:12.5px;cursor:pointer;padding:6px 8px;text-decoration:underline;
+  text-underline-offset:3px;
+}
+.tools{display:flex;justify-content:center;gap:4px;margin:26px 0 8px;flex-wrap:wrap}
+.note{text-align:center;font-size:11px;color:var(--ink-3);margin:0 20px 8px;line-height:1.7}
+
+/* ── 入力シート ─────────────────────── */
+.veil{position:fixed;inset:0;background:rgba(20,24,27,.45);z-index:30;display:none}
+.veil.on{display:block}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:31;background:var(--paper);
+  border-radius:14px 14px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom) + 20px);
+  max-height:92vh;overflow-y:auto;display:none;
+  box-shadow:0 -8px 30px rgba(20,24,27,.2);
+}
+.sheet.on{display:block;animation:rise .22s ease-out}
+@keyframes rise{from{transform:translateY(20px);opacity:.6}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet.on{animation:none}.fab:active{transform:translateX(-50%)}}
+.sheet h2{font-size:16px;margin:0 0 16px;font-weight:700;letter-spacing:.02em}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;color:var(--ink-2);margin-bottom:5px;letter-spacing:.04em}
+.field input,.field select{
+  width:100%;padding:12px;font-size:16px;font-family:var(--body);
+  border:1px solid var(--rule);border-radius:3px;background:#fff;color:var(--ink);
+}
+.row{display:flex;gap:10px}
+.row .field{flex:1}
+.sheet .go{
+  width:100%;padding:15px;background:var(--chrome);color:#fff;border:0;
+  border-radius:3px;font-size:15.5px;font-family:var(--body);font-weight:500;cursor:pointer;
+}
+.sheet .sub-actions{display:flex;justify-content:space-between;margin-top:12px}
+.del{color:var(--danger)!important}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <h1>備蓄点検表</h1>
+  <div class="sub">EMERGENCY STOCK · <span id="today"></span></div>
+</header>
+
+<nav class="tally" id="tally">
+  <button class="d0" data-f="danger"  aria-pressed="false"><span class="n" id="c0">0</span><span class="t">期限切れ</span></button>
+  <button class="d1" data-f="caution" aria-pressed="false"><span class="n" id="c1">0</span><span class="t">90日以内</span></button>
+  <button class="d2" data-f="safe"    aria-pressed="false"><span class="n" id="c2">0</span><span class="t">余裕あり</span></button>
+  <button class="d3" data-f="all"     aria-pressed="true"><span class="n" id="c3">0</span><span class="t">すべて</span></button>
+</nav>
+
+<main class="list" id="list"></main>
+
+<div class="tools">
+  <button class="txtbtn" id="expBtn">バックアップを書き出す</button>
+  <button class="txtbtn" id="impBtn">バックアップを読み込む</button>
+</div>
+<p class="note">データはこの端末のブラウザ内にだけ保存されます。<br>機種変更や履歴消去の前に書き出しておくと安心です。</p>
+<input type="file" id="impFile" accept="application/json,.json" hidden>
+
+<button class="fab" id="addBtn">＋ 備蓄品を追加</button>
+
+<div class="veil" id="veil"></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <h2 id="sheetTitle">備蓄品を追加</h2>
+  <div class="field">
+    <label for="fName">品名</label>
+    <input id="fName" type="text" placeholder="例：長期保存水 2L" autocomplete="off">
+  </div>
+  <div class="field">
+    <label for="fCat">分類</label>
+    <select id="fCat">
+      <option>飲料水</option><option>主食</option><option>おかず・缶詰</option>
+      <option>加熱・燃料</option><option>衛生用品</option><option>医薬品</option><option>その他</option>
+    </select>
+  </div>
+  <div class="row">
+    <div class="field">
+      <label for="fQty">数量</label>
+      <input id="fQty" type="text" inputmode="decimal" placeholder="6">
+    </div>
+    <div class="field">
+      <label for="fUnit">単位</label>
+      <input id="fUnit" type="text" placeholder="本" autocomplete="off">
+    </div>
+  </div>
+  <div class="field">
+    <label for="fDate">賞味期限・使用期限</label>
+    <input id="fDate" type="date">
+  </div>
+  <button class="go" id="saveBtn">保存する</button>
+  <div class="sub-actions">
+    <button class="txtbtn del" id="delBtn" hidden>この品目を削除</button>
+    <button class="txtbtn" id="cancelBtn">閉じる</button>
+  </div>
+</section>
+
+<script>
+(function(){
+  'use strict';
+  var KEY='bichiku.v1', mem=[], editing=null, filter='all';
+
+  /* 保存：localStorageが使えない環境ではメモリに退避する */
+  function load(){
+    try{ var r=localStorage.getItem(KEY); mem = r?JSON.parse(r):[]; }catch(e){}
+    if(!Array.isArray(mem)) mem=[];
+    return mem;
+  }
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(mem)); }catch(e){}
+  }
+
+  var $=function(id){return document.getElementById(id)};
+
+  function midnight(d){ return new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime(); }
+  function daysLeft(iso){
+    var p=iso.split('-');
+    var t=new Date(+p[0], +p[1]-1, +p[2]).getTime();
+    return Math.round((t - midnight(new Date()))/86400000);
+  }
+  function statusOf(d){ return d<0?'danger' : d<=90?'caution' : 'safe'; }
+  function fmt(iso){ var p=iso.split('-'); return p[0]+'/'+p[1]+'/'+p[2]; }
+  function esc(s){ return String(s).replace(/[&<>"]/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  function render(){
+    var items = mem.slice().sort(function(a,b){ return a.date<b.date?-1:a.date>b.date?1:0; });
+    var counts={danger:0,caution:0,safe:0};
+    items.forEach(function(it){ counts[statusOf(daysLeft(it.date))]++; });
+    $('c0').textContent=counts.danger; $('c1').textContent=counts.caution;
+    $('c2').textContent=counts.safe;   $('c3').textContent=items.length;
+
+    var shown = filter==='all' ? items : items.filter(function(it){
+      return statusOf(daysLeft(it.date))===filter; });
+
+    var list=$('list');
+    if(!items.length){
+      list.innerHTML='<div class="empty"><p class="lead">まだ何も登録されていません。</p>'+
+        '<p>棚の一列ぶんから始めると続きます。<br>まずは水と主食を入れてみてください。</p>'+
+        '<button class="txtbtn" id="seedBtn">例として5品目を入れる</button></div>';
+      $('seedBtn').onclick=seed;
+      return;
+    }
+    if(!shown.length){
+      list.innerHTML='<div class="empty"><p class="lead">この状態の品目はありません。</p>'+
+        '<p>上の「すべて」を押すと全件に戻ります。</p></div>';
+      return;
+    }
+    list.innerHTML = shown.map(function(it){
+      var d=daysLeft(it.date), st=statusOf(d);
+      var pct=Math.max(0,Math.min(100, (d/365)*100));
+      var qty = it.qty ? esc(it.qty)+esc(it.unit||'') : '';
+      var num = d<0 ? Math.abs(d) : d;
+      var lab = d<0 ? '日 超過' : d===0 ? '本日まで' : '日 のこり';
+      return '<article class="slip s-'+st+'" data-id="'+it.id+'" tabindex="0" role="button">'+
+        '<div class="band"></div>'+
+        '<div class="body">'+
+          '<div class="name">'+esc(it.name)+'</div>'+
+          '<div class="meta">'+esc(it.cat)+(qty?'<span class="dot">·</span>'+qty:'')+
+            '<span class="dot">·</span>'+fmt(it.date)+'</div>'+
+          '<div class="gauge"><i style="width:'+pct+'%"></i>'+
+            '<b style="left:25%"></b><b style="left:50%"></b><b style="left:75%"></b></div>'+
+          '<div class="scale"><span>今日</span><span>6か月</span><span>1年</span></div>'+
+        '</div>'+
+        '<div class="right"><div class="days">'+(d===0?'0':num)+'</div>'+
+          '<div class="unit">'+lab+'</div></div>'+
+      '</article>';
+    }).join('');
+    Array.prototype.forEach.call(list.querySelectorAll('.slip'), function(el){
+      el.onclick=function(){ open(el.dataset.id); };
+      el.onkeydown=function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(el.dataset.id); } };
+    });
+  }
+
+  /* 入力シート */
+  function open(id){
+    editing = id ? mem.filter(function(x){return x.id===id})[0] : null;
+    $('sheetTitle').textContent = editing ? '備蓄品を編集' : '備蓄品を追加';
+    $('fName').value = editing?editing.name:'';
+    $('fCat').value  = editing?editing.cat:'飲料水';
+    $('fQty').value  = editing?(editing.qty||''):'';
+    $('fUnit').value = editing?(editing.unit||''):'';
+    $('fDate').value = editing?editing.date:'';
+    $('delBtn').hidden = !editing;
+    $('veil').classList.add('on'); $('sheet').classList.add('on');
+    if(!editing) setTimeout(function(){ $('fName').focus(); },60);
+  }
+  function close(){
+    $('veil').classList.remove('on'); $('sheet').classList.remove('on'); editing=null;
+  }
+
+  $('addBtn').onclick=function(){ open(null); };
+  $('cancelBtn').onclick=close;
+  $('veil').onclick=close;
+
+  $('saveBtn').onclick=function(){
+    var name=$('fName').value.trim(), date=$('fDate').value;
+    if(!name){ $('fName').focus(); $('fName').placeholder='品名を入れてください'; return; }
+    if(!date){ $('fDate').focus(); return; }
+    var rec={ id: editing?editing.id:String(Date.now())+Math.random().toString(36).slice(2,6),
+      name:name, cat:$('fCat').value, qty:$('fQty').value.trim(),
+      unit:$('fUnit').value.trim(), date:date };
+    if(editing){ mem[mem.indexOf(editing)]=rec; } else { mem.push(rec); }
+    save(); close(); render();
+  };
+
+  $('delBtn').onclick=function(){
+    if(!editing) return;
+    if(!confirm('「'+editing.name+'」を削除します。よろしいですか？')) return;
+    mem.splice(mem.indexOf(editing),1); save(); close(); render();
+  };
+
+  /* 絞り込み */
+  Array.prototype.forEach.call($('tally').querySelectorAll('button'), function(b){
+    b.onclick=function(){
+      filter = b.dataset.f;
+      Array.prototype.forEach.call($('tally').querySelectorAll('button'), function(x){
+        x.setAttribute('aria-pressed', x===b ? 'true':'false'); });
+      render();
+    };
+  });
+
+  /* バックアップ */
+  $('expBtn').onclick=function(){
+    var blob=new Blob([JSON.stringify(mem,null,2)],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='bichiku-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  };
+  $('impBtn').onclick=function(){ $('impFile').click(); };
+  $('impFile').onchange=function(e){
+    var f=e.target.files[0]; if(!f) return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{
+        var data=JSON.parse(r.result);
+        if(!Array.isArray(data)) throw 0;
+        mem=data; save(); render();
+      }catch(err){ alert('読み込めませんでした。このアプリで書き出したファイルを選んでください。'); }
+    };
+    r.readAsText(f); e.target.value='';
+  };
+
+  function seed(){
+    var t=new Date(), iso=function(days){
+      var d=new Date(t.getFullYear(),t.getMonth(),t.getDate()+days);
+      return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+    };
+    mem=[
+      {id:'s1',name:'長期保存水 2L',cat:'飲料水',qty:'12',unit:'本',date:iso(1180)},
+      {id:'s2',name:'アルファ米 五目ごはん',cat:'主食',qty:'10',unit:'食',date:iso(420)},
+      {id:'s3',name:'さば味噌煮 缶詰',cat:'おかず・缶詰',qty:'8',unit:'缶',date:iso(63)},
+      {id:'s4',name:'カセットボンベ',cat:'加熱・燃料',qty:'6',unit:'本',date:iso(240)},
+      {id:'s5',name:'ウェットティッシュ',cat:'衛生用品',qty:'3',unit:'袋',date:iso(-25)}
+    ];
+    save(); render();
+  }
+
+  var n=new Date();
+  $('today').textContent = n.getFullYear()+'.'+('0'+(n.getMonth()+1)).slice(-2)+'.'+('0'+n.getDate()).slice(-2);
+  load(); render();
+})();
+</script>
+</body>
+</html>
